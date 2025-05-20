@@ -138,8 +138,8 @@ export function TwoFactorEnableDisable({
                     },
                     onSuccess(ctx) {
                       setTwoFactorVerifyURI(ctx.data.totpURI);
-                      toast.success("2FA enabled successfully");
-                      setTwoFactorDialog(false);
+                      // toast.success("2FA enabled successfully");
+                      // setTwoFactorDialog(false);
                     },
                   },
                 });
