@@ -95,7 +95,6 @@ export const auth = betterAuth({
     enabled: true,
     storage: 'database',
   },
-  trustedOrigins: [process.env.VERCEL_URL!],
   database: drizzleAdapter(db, {
     provider: 'pg',
   }),
