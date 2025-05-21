@@ -51,9 +51,11 @@ export function DeleteTasksDialog({
 
   function onDelete() {
     startDeleteTransition(async () => {
-      const { error } = await deleteTasks({
+      const response = await deleteTasks({
         ids: tasks.map((task) => task.id),
       });
+
+      const error = response?.data?.error ?? response?.serverError;
 
       if (error) {
         toast.error(error);

@@ -34,10 +34,12 @@ export function UpdateTaskForm({ task }: UpdateTaskFormProps) {
     startTransition(async () => {
       if (!task) return;
 
-      const { error } = await updateTask({
+      const response = await updateTask({
         id: task.id,
         ...input,
       });
+
+      const error = response?.data?.error;
 
       if (error) {
         toast.error(error);

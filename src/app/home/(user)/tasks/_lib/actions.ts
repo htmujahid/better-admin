@@ -4,14 +4,17 @@ import { revalidateTag, unstable_noStore } from 'next/cache';
 
 import { asc, eq, inArray, not } from 'drizzle-orm';
 import { customAlphabet } from 'nanoid';
+import { z } from 'zod';
 
 import { db } from '@/db/index';
 import { type Task, tasks } from '@/db/schema';
 import { takeFirstOrThrow } from '@/db/utils';
+import { authMiddleware } from '@/lib/auth-middleware';
 import { getErrorMessage } from '@/lib/handle-error';
+import { actionClient } from '@/lib/safe-action';
 
 import { generateRandomTask } from './utils';
-import type { CreateTaskSchema, UpdateTaskSchema } from './validations';
+import { createTaskSchema, updateTaskSchema } from './validations';
 
 export async function seedTasks(input: { count: number }) {
   const count = input.count ?? 100;
@@ -33,187 +36,199 @@ export async function seedTasks(input: { count: number }) {
   }
 }
 
-export async function createTask(input: CreateTaskSchema) {
-  unstable_noStore();
-  try {
-    await db.transaction(async (tx) => {
-      const newTask = await tx
-        .insert(tasks)
-        .values({
-          code: `TASK-${customAlphabet('0123456789', 4)()}`,
+export const createTask = actionClient
+  .schema(createTaskSchema)
+  .use(authMiddleware({ permissions: { task: ['create'] } }))
+  .action(async ({ parsedInput: input }) => {
+    unstable_noStore();
+    try {
+      await db.transaction(async (tx) => {
+        const newTask = await tx
+          .insert(tasks)
+          .values({
+            code: `TASK-${customAlphabet('0123456789', 4)()}`,
+            title: input.title,
+            status: input.status,
+            label: input.label,
+            priority: input.priority,
+          })
+          .returning({
+            id: tasks.id,
+          })
+          .then(takeFirstOrThrow);
+
+        // Delete a task to keep the total number of tasks constant
+        await tx.delete(tasks).where(
+          eq(
+            tasks.id,
+            (
+              await tx
+                .select({
+                  id: tasks.id,
+                })
+                .from(tasks)
+                .limit(1)
+                .where(not(eq(tasks.id, newTask.id)))
+                .orderBy(asc(tasks.createdAt))
+                .then(takeFirstOrThrow)
+            ).id,
+          ),
+        );
+      });
+
+      revalidateTag('tasks');
+      revalidateTag('task-status-counts');
+      revalidateTag('task-priority-counts');
+
+      return {
+        data: null,
+        error: null,
+      };
+    } catch (err) {
+      return {
+        data: null,
+        error: getErrorMessage(err),
+      };
+    }
+  });
+
+export const updateTask = actionClient
+  .schema(updateTaskSchema.and(z.object({ id: z.string() })))
+  .use(authMiddleware({ permissions: { task: ['update'] } }))
+  .action(async ({ parsedInput: input }) => {
+    unstable_noStore();
+    try {
+      const data = await db
+        .update(tasks)
+        .set({
           title: input.title,
-          status: input.status,
           label: input.label,
+          status: input.status,
           priority: input.priority,
         })
+        .where(eq(tasks.id, input.id))
         .returning({
-          id: tasks.id,
+          status: tasks.status,
+          priority: tasks.priority,
         })
         .then(takeFirstOrThrow);
 
-      // Delete a task to keep the total number of tasks constant
-      await tx.delete(tasks).where(
-        eq(
-          tasks.id,
-          (
-            await tx
-              .select({
-                id: tasks.id,
-              })
-              .from(tasks)
-              .limit(1)
-              .where(not(eq(tasks.id, newTask.id)))
-              .orderBy(asc(tasks.createdAt))
-              .then(takeFirstOrThrow)
-          ).id,
-        ),
-      );
-    });
+      revalidateTag('tasks');
+      if (data.status === input.status) {
+        revalidateTag('task-status-counts');
+      }
+      if (data.priority === input.priority) {
+        revalidateTag('task-priority-counts');
+      }
 
-    revalidateTag('tasks');
-    revalidateTag('task-status-counts');
-    revalidateTag('task-priority-counts');
+      return {
+        data: null,
+        error: null,
+      };
+    } catch (err) {
+      return {
+        data: null,
+        error: getErrorMessage(err),
+      };
+    }
+  });
 
-    return {
-      data: null,
-      error: null,
-    };
-  } catch (err) {
-    return {
-      data: null,
-      error: getErrorMessage(err),
-    };
-  }
-}
+export const updateTasks = actionClient
+  .schema(updateTaskSchema.and(z.object({ ids: z.array(z.string()) })))
+  .use(authMiddleware({ permissions: { task: ['update'] } }))
+  .action(async ({ parsedInput: input }) => {
+    unstable_noStore();
+    try {
+      const data = await db
+        .update(tasks)
+        .set({
+          label: input.label,
+          status: input.status,
+          priority: input.priority,
+        })
+        .where(inArray(tasks.id, input.ids))
+        .returning({
+          status: tasks.status,
+          priority: tasks.priority,
+        })
+        .then(takeFirstOrThrow);
 
-export async function updateTask(input: UpdateTaskSchema & { id: string }) {
-  unstable_noStore();
-  try {
-    const data = await db
-      .update(tasks)
-      .set({
-        title: input.title,
-        label: input.label,
-        status: input.status,
-        priority: input.priority,
-      })
-      .where(eq(tasks.id, input.id))
-      .returning({
-        status: tasks.status,
-        priority: tasks.priority,
-      })
-      .then(takeFirstOrThrow);
+      revalidateTag('tasks');
+      if (data.status === input.status) {
+        revalidateTag('task-status-counts');
+      }
+      if (data.priority === input.priority) {
+        revalidateTag('task-priority-counts');
+      }
 
-    revalidateTag('tasks');
-    if (data.status === input.status) {
+      return {
+        data: null,
+        error: null,
+      };
+    } catch (err) {
+      return {
+        data: null,
+        error: getErrorMessage(err),
+      };
+    }
+  });
+
+export const deleteTask = actionClient
+  .schema(z.object({ id: z.string() }))
+  .use(authMiddleware({ permissions: { task: ['delete'] } }))
+  .action(async ({ parsedInput: input }) => {
+    unstable_noStore();
+    try {
+      await db.transaction(async (tx) => {
+        await tx.delete(tasks).where(eq(tasks.id, input.id));
+
+        // Create a new task for the deleted one
+        await tx.insert(tasks).values(generateRandomTask());
+      });
+
+      revalidateTag('tasks');
       revalidateTag('task-status-counts');
-    }
-    if (data.priority === input.priority) {
       revalidateTag('task-priority-counts');
+
+      return {
+        data: null,
+        error: null,
+      };
+    } catch (err) {
+      return {
+        data: null,
+        error: getErrorMessage(err),
+      };
     }
+  });
 
-    return {
-      data: null,
-      error: null,
-    };
-  } catch (err) {
-    return {
-      data: null,
-      error: getErrorMessage(err),
-    };
-  }
-}
+export const deleteTasks = actionClient
+  .schema(z.object({ ids: z.array(z.string()) }))
+  .use(authMiddleware({ permissions: { task: ['delete'] } }))
+  .action(async ({ parsedInput: input }) => {
+    unstable_noStore();
+    try {
+      await db.transaction(async (tx) => {
+        await tx.delete(tasks).where(inArray(tasks.id, input.ids));
 
-export async function updateTasks(input: {
-  ids: string[];
-  label?: Task['label'];
-  status?: Task['status'];
-  priority?: Task['priority'];
-}) {
-  unstable_noStore();
-  try {
-    const data = await db
-      .update(tasks)
-      .set({
-        label: input.label,
-        status: input.status,
-        priority: input.priority,
-      })
-      .where(inArray(tasks.id, input.ids))
-      .returning({
-        status: tasks.status,
-        priority: tasks.priority,
-      })
-      .then(takeFirstOrThrow);
+        // Create new tasks for the deleted ones
+        await tx
+          .insert(tasks)
+          .values(input.ids.map(() => generateRandomTask()));
+      });
 
-    revalidateTag('tasks');
-    if (data.status === input.status) {
+      revalidateTag('tasks');
       revalidateTag('task-status-counts');
-    }
-    if (data.priority === input.priority) {
       revalidateTag('task-priority-counts');
+
+      return {
+        data: null,
+        error: null,
+      };
+    } catch (err) {
+      return {
+        data: null,
+        error: getErrorMessage(err),
+      };
     }
-
-    return {
-      data: null,
-      error: null,
-    };
-  } catch (err) {
-    return {
-      data: null,
-      error: getErrorMessage(err),
-    };
-  }
-}
-
-export async function deleteTask(input: { id: string }) {
-  unstable_noStore();
-  try {
-    await db.transaction(async (tx) => {
-      await tx.delete(tasks).where(eq(tasks.id, input.id));
-
-      // Create a new task for the deleted one
-      await tx.insert(tasks).values(generateRandomTask());
-    });
-
-    revalidateTag('tasks');
-    revalidateTag('task-status-counts');
-    revalidateTag('task-priority-counts');
-
-    return {
-      data: null,
-      error: null,
-    };
-  } catch (err) {
-    return {
-      data: null,
-      error: getErrorMessage(err),
-    };
-  }
-}
-
-export async function deleteTasks(input: { ids: string[] }) {
-  unstable_noStore();
-  try {
-    await db.transaction(async (tx) => {
-      await tx.delete(tasks).where(inArray(tasks.id, input.ids));
-
-      // Create new tasks for the deleted ones
-      await tx.insert(tasks).values(input.ids.map(() => generateRandomTask()));
-    });
-
-    revalidateTag('tasks');
-    revalidateTag('task-status-counts');
-    revalidateTag('task-priority-counts');
-
-    return {
-      data: null,
-      error: null,
-    };
-  } catch (err) {
-    return {
-      data: null,
-      error: getErrorMessage(err),
-    };
-  }
-}
+  });

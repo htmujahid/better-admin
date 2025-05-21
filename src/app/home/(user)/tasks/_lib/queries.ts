@@ -13,25 +13,33 @@ import {
   lte,
   sql,
 } from 'drizzle-orm';
+import { z } from 'zod';
 
 import { db } from '@/db';
 import { tasks } from '@/db/schema';
+import { authMiddleware } from '@/lib/auth-middleware';
+import { authenticate } from '@/lib/authenticate';
 import { filterColumns } from '@/lib/filter-columns';
 import { getErrorMessage } from '@/lib/handle-error';
+import { actionClient } from '@/lib/safe-action';
 import { unstable_cache } from '@/lib/unstable-cache';
 
 import type { GetTasksSchema } from './validations';
 
-export async function getTask(taskId: string) {
-  try {
-    const task = await db.select().from(tasks).where(eq(tasks.id, taskId));
-    return { data: task[0], error: null };
-  } catch (err) {
-    return { data: null, error: getErrorMessage(err) };
-  }
-}
+export const getTask = actionClient
+  .schema(z.object({ id: z.string() }))
+  .use(authMiddleware({ permissions: { task: ['read'] } }))
+  .action(async ({ parsedInput: input }) => {
+    try {
+      const task = await db.select().from(tasks).where(eq(tasks.id, input.id));
+      return { data: task[0], error: null };
+    } catch (err) {
+      return { data: null, error: getErrorMessage(err) };
+    }
+  });
 
 export async function getTasks(input: GetTasksSchema) {
+  await authenticate({ permissions: { task: ['read'] } });
   return await unstable_cache(
     async () => {
       try {
@@ -139,6 +147,7 @@ export async function getTasks(input: GetTasksSchema) {
 }
 
 export async function getTaskStatusCounts() {
+  await authenticate({ permissions: { task: ['read'] } });
   return unstable_cache(
     async () => {
       try {
@@ -182,6 +191,7 @@ export async function getTaskStatusCounts() {
 }
 
 export async function getTaskPriorityCounts() {
+  await authenticate({ permissions: { task: ['read'] } });
   return unstable_cache(
     async () => {
       try {
@@ -223,6 +233,7 @@ export async function getTaskPriorityCounts() {
 }
 
 export async function getEstimatedHoursRange() {
+  await authenticate({ permissions: { task: ['read'] } });
   return unstable_cache(
     async () => {
       try {

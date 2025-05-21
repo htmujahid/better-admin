@@ -2,7 +2,6 @@
 
 import * as React from "react"
 import { Search } from "lucide-react"
-import { User } from "better-auth"
 
 import { NavSecondary } from "@/components/sidebar/nav-secondary"
 import { NavUser } from "@/components/sidebar/nav-user"
@@ -22,6 +21,7 @@ import { NavPrimary } from "@/components/sidebar/nav-primary"
 import { navPrimaryData, navResourceShopData, navSecondaryData, searchCommandData, navDocumentsData } from "./user-sidebar-data"
 import { NavResources } from "@/components/sidebar/nav-resources"
 import { NavDocuments } from "@/components/sidebar/nav-documents"
+import { User } from "@/components/auth-provider"
 
 export function UserSidebar({ user }: { user: User }) {
   return (

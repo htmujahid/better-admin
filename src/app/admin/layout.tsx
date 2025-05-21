@@ -6,27 +6,16 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { AdminSidebar } from "./_components/admin-sidebar"
-import { redirect } from "next/navigation"
-import pathsConfig from "@/config/paths.config"
-import { getSession } from "@/app/home/(user)/_lib/actions/get-session"
+import { withAuthenticate } from "@/lib/with-authenticate"
+import { User } from "@/components/auth-provider"
 
-export default async function AdminLayout({
-  children
+async function AdminLayout({
+  children,
+  user
 }: {
   children: React.ReactNode
+  user: User
 }) {
-  const data = await getSession();
-
-  if (!data) {
-    redirect(pathsConfig.auth.signIn);
-  }
-
-  if (!data.user.role?.split(',').includes('admin')) {
-    redirect(pathsConfig.app.home);
-  }
-
-  const user = data.user
-
   return (
     <SidebarProvider>
       <AdminSidebar user={user} />
@@ -48,3 +37,7 @@ export default async function AdminLayout({
     </SidebarProvider>
   )
 }
+
+export default withAuthenticate(AdminLayout, {
+  role: 'admin'
+})

@@ -5,24 +5,17 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
+import { User } from "@/components/auth-provider"
+import { withAuthenticate } from "@/lib/with-authenticate"
 import { UserSidebar } from "./_components/user-sidebar"
-import { redirect } from "next/navigation"
-import pathsConfig from "@/config/paths.config"
-import { getSession } from "./_lib/actions/get-session"
 
-export default async function UserLayout({
-  children
+async function UserLayout({
+  children,
+  user
 }: {
   children: React.ReactNode
+  user: User
 }) {
-  const data = await getSession();
-
-  if (!data) {
-    redirect(pathsConfig.auth.signIn);
-  }
-
-  const user = data.user
-
   return (
     <SidebarProvider>
       <UserSidebar user={user} />
@@ -44,3 +37,5 @@ export default async function UserLayout({
     </SidebarProvider>
   )
 }
+
+export default withAuthenticate(UserLayout)

@@ -57,10 +57,12 @@ export function TasksTableActionBar({ table }: TasksTableActionBarProps) {
         field === "status" ? "update-status" : "update-priority",
       );
       startTransition(async () => {
-        const { error } = await updateTasks({
+        const response = await updateTasks({
           ids: rows.map((row) => row.original.id),
           [field]: value,
         });
+
+        const error = response?.data?.error;
 
         if (error) {
           toast.error(error);
@@ -85,9 +87,11 @@ export function TasksTableActionBar({ table }: TasksTableActionBarProps) {
   const onTaskDelete = React.useCallback(() => {
     setCurrentAction("delete");
     startTransition(async () => {
-      const { error } = await deleteTasks({
+      const response = await deleteTasks({
         ids: rows.map((row) => row.original.id),
       });
+
+      const error = response?.data?.error;
 
       if (error) {
         toast.error(error);

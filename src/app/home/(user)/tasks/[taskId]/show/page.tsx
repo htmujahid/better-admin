@@ -1,16 +1,17 @@
-import { CardContent } from "@/components/ui/card";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { CalendarIcon, ClockIcon, PencilIcon } from "lucide-react";
 
+import { CardContent } from "@/components/ui/card";
 import { Page, PageTitleBar } from "@/components/page";
 import { Button } from "@/components/ui/button";
-import { CalendarIcon, ClockIcon, PencilIcon } from "lucide-react";
-import Link from "next/link";
-import { DeleteTasksDialog } from "../../_components/delete-tasks-dialog";
 import { Card, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
+
 import { getTask } from "../../_lib/queries";
-import { notFound } from "next/navigation";
+import { DeleteTasksDialog } from "../../_components/delete-tasks-dialog";
 
 export default async function ShowTaskPage({
   params,
@@ -19,7 +20,9 @@ export default async function ShowTaskPage({
 }) {
   const { taskId } = await params;
 
-  const { data, error } = await getTask(taskId);
+  const response = await getTask({ id: taskId });
+  const data = response?.data?.data;
+  const error = response?.data?.error ?? response?.serverError;
 
   if (error || !data) {
     notFound();

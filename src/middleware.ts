@@ -46,31 +46,6 @@ const middlewares: MiddlewareConfig = {
       return NextResponse.next();
     },
   ],
-  '/api/:slug*': [
-    async (request) => {
-      const allowedOrigins = [appConfig.url];
-      const origin = request.headers.get('origin');
-      const response = NextResponse.next();
-
-      if (origin && allowedOrigins.includes(origin)) {
-        response.headers.set('Access-Control-Allow-Origin', origin);
-      } else {
-        response.headers.set(
-          'Access-Control-Allow-Origin',
-          allowedOrigins.join(','),
-        );
-      }
-      response.headers.set(
-        'Access-Control-Allow-Methods',
-        'GET, POST, PUT, DELETE, OPTIONS',
-      );
-      response.headers.set(
-        'Access-Control-Allow-Headers',
-        'Content-Type, Authorization',
-      );
-      return response;
-    },
-  ],
 };
 
 export const middleware = createNEMO(middlewares);

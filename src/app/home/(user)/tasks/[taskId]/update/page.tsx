@@ -14,7 +14,9 @@ export default async function UpdateTaskPage({
 }) {
   const { taskId } = await params;
 
-  const { data, error } = await getTask(taskId);
+  const response = await getTask({id: taskId});
+  const data = response?.data?.data;
+  const error = response?.data?.error ?? response?.serverError;
 
   if (error || !data) {
     notFound();

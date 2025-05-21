@@ -24,7 +24,9 @@ export function CreateTaskForm() {
 
   function onSubmit(input: CreateTaskSchema) {
     startTransition(async () => {
-      const { error } = await createTask(input);
+      const response = await createTask(input);
+
+      const error = response?.data?.error ?? response?.serverError;
 
       if (error) {
         toast.error(error);

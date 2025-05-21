@@ -5,27 +5,17 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
+import { User } from "@/components/auth-provider"
+import { withAuthenticate } from "@/lib/with-authenticate"
 import { OrganizationSidebar } from "./_components/organization-sidebar"
-import { auth } from "@/lib/auth"
-import { redirect } from "next/navigation"
-import pathsConfig from "@/config/paths.config"
-import { headers } from "next/headers"
 
-export default async function OrganizationLayout({
-  children
+async function OrganizationLayout({
+  children,
+  user
 }: {
   children: React.ReactNode
+  user: User
 }) {
-  const data = await auth.api.getSession({
-    headers: await headers()
-  })
-
-  if (!data) {
-    redirect(pathsConfig.auth.signIn)
-  }
-
-  const user = data.user
-
   return (
     <SidebarProvider>
       <OrganizationSidebar user={user} />
@@ -47,3 +37,5 @@ export default async function OrganizationLayout({
     </SidebarProvider>
   )
 }
+
+export default withAuthenticate(OrganizationLayout)
