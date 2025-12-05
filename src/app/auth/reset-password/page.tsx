@@ -1,13 +1,20 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ResetPasswordForm } from "../_components/reset-password-form";
-import Link from "next/link";
+import Link from 'next/link';
+
+import { ResetPasswordForm } from '@/components/auth/reset-password-form';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 
 export default async function ResetPasswordPage({
   searchParams,
 }: {
-  searchParams: Promise<{ token: string }>
+  searchParams: Promise<{ token: string }>;
 }) {
-  const { token } = await searchParams
+  const { token } = await searchParams;
 
   return (
     <Card>
@@ -20,12 +27,12 @@ export default async function ResetPasswordPage({
       <CardContent className="space-y-6">
         <ResetPasswordForm token={token} />
         <div className="text-center text-sm">
-          Back to{" "}
+          Back to{' '}
           <Link href="/auth/sign-in" className="underline underline-offset-4">
             Sign in
           </Link>
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

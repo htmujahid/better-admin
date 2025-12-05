@@ -8,7 +8,8 @@ import type { EmptyProps } from '@/types';
 import type { ExtendedColumnFilter, Option } from '@/types/data-table';
 
 export interface UseDataTableProps<TData>
-  extends Required<Pick<TableOptions<TData>, 'pageCount'>>,
+  extends
+    Required<Pick<TableOptions<TData>, 'pageCount'>>,
     Pick<
       TableOptions<TData>,
       'data' | 'columns' | 'getRowId' | 'defaultColumn' | 'initialState'
@@ -84,14 +85,16 @@ export interface DataTableToolbarProps<TData> extends EmptyProps<'div'> {
   table: Table<TData>;
 }
 
-export interface DataTableAdvancedToolbarProps<TData>
-  extends EmptyProps<'div'> {
+export interface DataTableAdvancedToolbarProps<
+  TData,
+> extends EmptyProps<'div'> {
   /** The table instance. */
   table: Table<TData>;
 }
 
-export interface DataTableActionBarProps<TData>
-  extends EmptyProps<typeof motion.div> {
+export interface DataTableActionBarProps<TData> extends EmptyProps<
+  typeof motion.div
+> {
   /** The table instance. */
   table: Table<TData>;
 
@@ -105,8 +108,9 @@ export interface DataTableActionBarProps<TData>
   container?: Element | DocumentFragment | null;
 }
 
-export interface DataTableColumnHeaderProps<TData, TValue>
-  extends EmptyProps<typeof DropdownMenuTrigger> {
+export interface DataTableColumnHeaderProps<TData, TValue> extends EmptyProps<
+  typeof DropdownMenuTrigger
+> {
   /** The column instance. */
   column: Column<TData, TValue>;
 
@@ -190,12 +194,14 @@ export interface DataTableFilterListProps<TData> {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface DataTableFilterMenuProps<TData>
-  extends DataTableFilterListProps<TData> {}
+export interface DataTableFilterMenuProps<
+  TData,
+> extends DataTableFilterListProps<TData> {}
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface DataTableSortListProps<TData>
-  extends DataTableFilterListProps<TData> {}
+export interface DataTableSortListProps<
+  TData,
+> extends DataTableFilterListProps<TData> {}
 
 export interface DataTablePaginationProps<TData> extends EmptyProps<'div'> {
   /** The table instance. */

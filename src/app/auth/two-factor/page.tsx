@@ -1,8 +1,9 @@
-"use client";
+'use client';
 
-import Link from "next/link";
+import Link from 'next/link';
 
-import { Button } from "@/components/ui/button";
+import { TwoFactorForm } from '@/components/auth/two-factor-form';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -10,8 +11,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { TwoFactorForm } from "../_components/two-factor-form";
+} from '@/components/ui/card';
 
 export default function TwoFactorPage() {
   return (
@@ -25,7 +25,7 @@ export default function TwoFactorPage() {
       <CardContent>
         <TwoFactorForm />
       </CardContent>
-      <CardFooter className="text-sm text-muted-foreground gap-2">
+      <CardFooter className="text-muted-foreground gap-2 text-sm">
         <Link href="/auth/two-factor/otp">
           <Button variant="link" size="sm">
             Switch to Email Verification

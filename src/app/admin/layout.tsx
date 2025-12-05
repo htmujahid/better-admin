@@ -1,20 +1,21 @@
-import { AppBreadcrumbs } from "@/components/app-breadcrumb"
-import { Separator } from "@/components/ui/separator"
+import { User } from 'better-auth';
+
+import { withAuthenticate } from '@/components/acccess/with-authenticate';
+import { AdminSidebar } from '@/components/admin/admin-sidebar';
+import { AppBreadcrumbs } from '@/components/app-breadcrumb';
+import { Separator } from '@/components/ui/separator';
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
-} from "@/components/ui/sidebar"
-import { AdminSidebar } from "./_components/admin-sidebar"
-import { withAuthenticate } from "@/lib/with-authenticate"
-import { User } from "@/components/auth-provider"
+} from '@/components/ui/sidebar';
 
 async function AdminLayout({
   children,
-  user
+  user,
 }: {
-  children: React.ReactNode
-  user: User
+  children: React.ReactNode;
+  user: User;
 }) {
   return (
     <SidebarProvider>
@@ -30,14 +31,12 @@ async function AdminLayout({
             <AppBreadcrumbs />
           </div>
         </header>
-        <div className="flex flex-1 p-4 pt-0">
-          {children}
-        </div>
+        <div className="flex flex-1 p-4 pt-0">{children}</div>
       </SidebarInset>
     </SidebarProvider>
-  )
+  );
 }
 
 export default withAuthenticate(AdminLayout, {
-  role: 'admin'
-})
+  role: 'admin',
+});

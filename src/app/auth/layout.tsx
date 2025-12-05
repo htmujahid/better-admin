@@ -10,7 +10,7 @@ function AuthLayout({ children }: React.PropsWithChildren) {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 export default AuthLayout;

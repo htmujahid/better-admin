@@ -12,6 +12,7 @@ const PathsSchema = z.object({
     home: z.string().min(1),
     account: z.string().min(1),
     security: z.string().min(1),
+    preferences: z.string().min(1),
   }),
   admin: z.object({
     root: z.string().min(1),
@@ -31,6 +32,7 @@ const pathsConfig = PathsSchema.parse({
     home: '/home',
     account: '/home/account',
     security: '/home/security',
+    preferences: '/home/preferences',
   },
   admin: {
     root: '/admin',

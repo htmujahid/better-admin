@@ -6,10 +6,10 @@ export function AppLogo({ path }: { path?: string }) {
       href={path ?? '/'}
       className="flex items-center gap-2 self-center font-medium"
     >
-      <div className="flex h-6 w-6 items-center justify-center rounded-md bg-primary text-primary-foreground">
+      <div className="bg-primary text-primary-foreground flex h-6 w-6 items-center justify-center rounded-md">
         ~
       </div>
-      Better Admin
+      Next Bard
     </Link>
-  )
+  );
 }

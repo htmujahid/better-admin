@@ -1,22 +1,22 @@
-import type { allRoles } from '@/lib/roles'
-import { useAccessControl } from '@/components/auth-provider'
+import { useAccessControl } from '@/components/providers/auth-provider';
+import type { allRoles } from '@/lib/auth/roles';
 
-type AuthorizeFunction = (typeof allRoles)[keyof typeof allRoles]['authorize']
+type AuthorizeFunction = (typeof allRoles)[keyof typeof allRoles]['authorize'];
 
 export function HasPermission({
   children,
   permissions,
   connector,
 }: {
-  children: React.ReactNode
-  permissions: Parameters<AuthorizeFunction>[0]
-  connector: Parameters<AuthorizeFunction>[1]
+  children: React.ReactNode;
+  permissions: Parameters<AuthorizeFunction>[0];
+  connector: Parameters<AuthorizeFunction>[1];
 }) {
-  const { hasPermission } = useAccessControl()
+  const { hasPermission } = useAccessControl();
 
   if (hasPermission(permissions, connector)) {
-    return <>{children}</>
+    return <>{children}</>;
   }
 
-  return null
+  return null;
 }

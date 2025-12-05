@@ -1,36 +1,42 @@
-import { sql } from "drizzle-orm";
-import { boolean, pgTable, real, timestamp, varchar } from "drizzle-orm/pg-core";
+import { sql } from 'drizzle-orm';
+import {
+  boolean,
+  pgTable,
+  real,
+  timestamp,
+  varchar,
+} from 'drizzle-orm/pg-core';
 
-import { generateId } from "@/lib/id";
+import { generateId } from '@/lib/data-table/id';
 
-export const tasks = pgTable("tasks", {
-  id: varchar("id", { length: 30 })
+export const tasks = pgTable('tasks', {
+  id: varchar('id', { length: 30 })
     .$defaultFn(() => generateId())
     .primaryKey(),
-  code: varchar("code", { length: 128 }).notNull().unique(),
-  title: varchar("title", { length: 128 }),
-  status: varchar("status", {
+  code: varchar('code', { length: 128 }).notNull().unique(),
+  title: varchar('title', { length: 128 }),
+  status: varchar('status', {
     length: 30,
-    enum: ["todo", "in-progress", "done", "canceled"],
+    enum: ['todo', 'in-progress', 'done', 'canceled'],
   })
     .notNull()
-    .default("todo"),
-  label: varchar("label", {
+    .default('todo'),
+  label: varchar('label', {
     length: 30,
-    enum: ["bug", "feature", "enhancement", "documentation"],
+    enum: ['bug', 'feature', 'enhancement', 'documentation'],
   })
     .notNull()
-    .default("bug"),
-  priority: varchar("priority", {
+    .default('bug'),
+  priority: varchar('priority', {
     length: 30,
-    enum: ["low", "medium", "high"],
+    enum: ['low', 'medium', 'high'],
   })
     .notNull()
-    .default("low"),
-  estimatedHours: real("estimated_hours").notNull().default(0),
-  archived: boolean("archived").notNull().default(false),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at")
+    .default('low'),
+  estimatedHours: real('estimated_hours').notNull().default(0),
+  archived: boolean('archived').notNull().default(false),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at')
     .default(sql`current_timestamp`)
     .$onUpdate(() => new Date()),
 });

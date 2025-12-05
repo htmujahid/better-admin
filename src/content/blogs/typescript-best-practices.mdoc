@@ -1,0 +1,134 @@
+---
+title: "TypeScript Best Practices for 2024"
+description: "Learn essential TypeScript best practices to write cleaner, more maintainable, and type-safe code in your projects."
+categories: ['blog']
+tags: ['TypeScript', 'JavaScript', 'Best Practices']
+image: "/images/blogs/typescript.jpg"
+publishedAt: 2024-12-03
+status: "published"
+---
+
+> **Note:** This is mock/placeholder content for demonstration purposes.
+
+TypeScript has become the de facto standard for building large-scale JavaScript applications. Here are some best practices to help you write better TypeScript code.
+
+## 1. Use Strict Mode
+
+Always enable strict mode in your `tsconfig.json`. This catches more errors at compile time and forces you to write more explicit code.
+
+```json
+{
+  "compilerOptions": {
+    "strict": true
+  }
+}
+```
+
+## 2. Prefer Type Inference
+
+Let TypeScript infer types when possible. Don't over-annotate your code.
+
+```typescript
+// Over-annotated
+const name: string = "John";
+const numbers: number[] = [1, 2, 3];
+
+// Let TypeScript infer
+const name = "John";
+const numbers = [1, 2, 3];
+```
+
+## 3. Use Union Types and Type Guards
+
+Union types are powerful for representing values that could be one of several types.
+
+```typescript
+type Result<T> = { success: true; data: T } | { success: false; error: string };
+
+function handleResult<T>(result: Result<T>) {
+  if (result.success) {
+    console.log(result.data);
+  } else {
+    console.error(result.error);
+  }
+}
+```
+
+## 4. Leverage Utility Types
+
+TypeScript provides many built-in utility types that can save you time and make your code more expressive.
+
+```typescript
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  createdAt: Date;
+}
+
+// Make all properties optional
+type PartialUser = Partial<User>;
+
+// Make all properties required
+type RequiredUser = Required<User>;
+
+// Pick specific properties
+type UserCredentials = Pick<User, 'email' | 'name'>;
+
+// Omit specific properties
+type PublicUser = Omit<User, 'email'>;
+```
+
+## 5. Use Const Assertions
+
+Const assertions help you create more specific types from literal values.
+
+```typescript
+// Without const assertion - type is string[]
+const colors = ['red', 'green', 'blue'];
+
+// With const assertion - type is readonly ['red', 'green', 'blue']
+const colors = ['red', 'green', 'blue'] as const;
+```
+
+## 6. Define Clear API Boundaries
+
+Use interfaces for objects and types for unions, primitives, and complex types.
+
+```typescript
+// Use interface for objects
+interface ApiResponse {
+  data: unknown;
+  status: number;
+}
+
+// Use type for unions and complex types
+type Status = 'pending' | 'fulfilled' | 'rejected';
+type Callback<T> = (value: T) => void;
+```
+
+## 7. Handle Null and Undefined Properly
+
+Use optional chaining and nullish coalescing to handle null and undefined values safely.
+
+```typescript
+interface User {
+  address?: {
+    street?: string;
+  };
+}
+
+// Optional chaining
+const street = user?.address?.street;
+
+// Nullish coalescing
+const displayName = user.name ?? 'Anonymous';
+```
+
+## Conclusion
+
+Following these TypeScript best practices will help you write more maintainable, type-safe code. Remember that TypeScript is a tool to help you catch errors early and improve your development experience.
+
+---
+
+*Keep learning and improving your TypeScript skills!*

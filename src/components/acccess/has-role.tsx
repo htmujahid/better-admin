@@ -1,18 +1,20 @@
-import type { allRoles } from '@/lib/roles'
-import { useAccessControl } from '@/components/auth-provider'
+'use client';
+
+import { useAccessControl } from '@/components/providers/auth-provider';
+import type { allRoles } from '@/lib/auth/roles';
 
 export function HasRole({
   children,
   role,
 }: {
-  children: React.ReactNode
-  role: keyof typeof allRoles
+  children: React.ReactNode;
+  role: keyof typeof allRoles;
 }) {
-  const { hasRole } = useAccessControl()
+  const { hasRole } = useAccessControl();
 
   if (hasRole(role)) {
-    return <>{children}</>
+    return <>{children}</>;
   }
 
-  return null
+  return null;
 }

@@ -1,0 +1,74 @@
+---
+title: "Getting Started with Next.js"
+description: "Learn how to set up and build your first Next.js application with this comprehensive beginner's guide."
+categories: ['blog']
+tags: ['Next.js', 'React', 'Tutorial']
+image: "/images/blogs/nextjs.jpg"
+publishedAt: 2024-12-01
+status: "published"
+---
+
+> **Note:** This is mock/placeholder content for demonstration purposes.
+
+Next.js is a powerful React framework that enables you to build fast, scalable web applications with ease. In this guide, we'll walk through the basics of setting up a Next.js project.
+
+## Why Next.js?
+
+Next.js provides several features out of the box:
+
+- **Server-side rendering (SSR)** for improved SEO and performance
+- **Static site generation (SSG)** for blazing-fast pages
+- **API routes** for building backend functionality
+- **File-based routing** for intuitive navigation
+- **Built-in CSS and Sass support**
+
+## Setting Up Your First Project
+
+To create a new Next.js project, run the following command:
+
+```bash
+npx create-next-app@latest my-app
+```
+
+This will set up a new project with all the necessary dependencies.
+
+## Project Structure
+
+A typical Next.js project looks like this:
+
+```
+my-app/
+├── app/
+│   ├── layout.tsx
+│   └── page.tsx
+├── public/
+├── package.json
+└── next.config.ts
+```
+
+> The `app` directory is where all your routes and components live. Each folder represents a route segment.
+
+## Creating Your First Page
+
+In Next.js 13+, you create pages by adding a `page.tsx` file inside a folder:
+
+```tsx
+export default function HomePage() {
+  return (
+    <main>
+      <h1>Welcome to my Next.js app!</h1>
+    </main>
+  );
+}
+```
+
+## Next Steps
+
+Now that you have a basic understanding of Next.js, you can:
+
+1. Explore the [official documentation](https://nextjs.org/docs)
+2. Learn about data fetching patterns
+3. Implement authentication
+4. Deploy your app to Vercel
+
+Happy coding!

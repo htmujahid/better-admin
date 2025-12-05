@@ -31,7 +31,7 @@ import {
 } from 'nuqs';
 
 import { useDebouncedCallback } from '@/hooks/use-debounced-callback';
-import { getSortingStateParser } from '@/lib/parsers';
+import { getSortingStateParser } from '@/lib/data-table/parsers';
 import type { ExtendedColumnSort } from '@/types/data-table';
 
 const PAGE_KEY = 'page';
@@ -42,7 +42,8 @@ const DEBOUNCE_MS = 300;
 const THROTTLE_MS = 50;
 
 interface UseDataTableProps<TData>
-  extends Omit<
+  extends
+    Omit<
       TableOptions<TData>,
       | 'state'
       | 'pageCount'

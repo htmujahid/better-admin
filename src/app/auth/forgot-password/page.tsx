@@ -1,6 +1,13 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ForgotPasswordForm } from "../_components/forgot-password-form";
-import Link from "next/link";
+import Link from 'next/link';
+
+import { ForgotPasswordForm } from '@/components/auth/forgot-password-form';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 
 export default function ForgotPasswordPage() {
   return (
@@ -14,12 +21,12 @@ export default function ForgotPasswordPage() {
       <CardContent className="space-y-6">
         <ForgotPasswordForm />
         <div className="text-center text-sm">
-          Back to{" "}
+          Back to{' '}
           <Link href="/auth/sign-in" className="underline underline-offset-4">
             Sign in
           </Link>
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

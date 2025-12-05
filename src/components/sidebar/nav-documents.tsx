@@ -1,15 +1,17 @@
-'use client'
+'use client';
 
-import Link from 'next/link'
+import Link from 'next/link';
 
-import type { Permissions, Role } from '@/lib/roles'
+import { Ellipsis, FolderOpen, Share, Trash } from 'lucide-react';
+
+import { useAccessControl } from '@/components/providers/auth-provider';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+} from '@/components/ui/dropdown-menu';
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -18,22 +20,21 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from '@/components/ui/sidebar'
-import { useAccessControl } from '@/components/auth-provider'
-import { Ellipsis, FolderOpen, Share, Trash } from 'lucide-react'
+} from '@/components/ui/sidebar';
+import type { Permissions, Role } from '@/lib/auth/roles';
 
 export type NavDocumentItem = {
-  name: string
-  url: string
-  icon: React.ElementType
-  permission?: Permissions
-  role?: Role
-  disabled?: boolean
-}
+  name: string;
+  url: string;
+  icon: React.ElementType;
+  permission?: Permissions;
+  role?: Role;
+  disabled?: boolean;
+};
 
 export function NavDocuments({ items }: { items: Array<NavDocumentItem> }) {
-  const { isMobile } = useSidebar()
-  const { hasPermission, hasRole } = useAccessControl()
+  const { isMobile } = useSidebar();
+  const { hasPermission, hasRole } = useAccessControl();
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
@@ -41,10 +42,10 @@ export function NavDocuments({ items }: { items: Array<NavDocumentItem> }) {
       <SidebarMenu>
         {items.map((item) => {
           if (item.permission && !hasPermission(item.permission, 'OR')) {
-            return null
+            return null;
           }
           if (item.role && !hasRole(item.role)) {
-            return null
+            return null;
           }
           return (
             <SidebarMenuItem key={item.name}>
@@ -88,7 +89,7 @@ export function NavDocuments({ items }: { items: Array<NavDocumentItem> }) {
                 </DropdownMenuContent>
               </DropdownMenu>
             </SidebarMenuItem>
-          )
+          );
         })}
         <SidebarMenuItem>
           <SidebarMenuButton
@@ -101,5 +102,5 @@ export function NavDocuments({ items }: { items: Array<NavDocumentItem> }) {
         </SidebarMenuItem>
       </SidebarMenu>
     </SidebarGroup>
-  )
+  );
 }

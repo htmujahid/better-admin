@@ -1,47 +1,47 @@
-'use client'
+'use client';
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react';
 
-import { Image as ImageIcon } from 'lucide-react'
-import { useForm } from 'react-hook-form'
+import { Image as ImageIcon } from 'lucide-react';
+import { useForm } from 'react-hook-form';
 
-import { Button } from '@/components/ui/button'
-import { ImageUploadInput } from '@/components/image-upload-input'
+import { ImageUploadInput } from '@/components/image-upload-input';
+import { Button } from '@/components/ui/button';
 
 export function ImageUploader(
   props: React.PropsWithChildren<{
-    value: string | null | undefined
-    onValueChange: (value: File | null) => unknown
+    value: string | null | undefined;
+    onValueChange: (value: File | null) => unknown;
   }>,
 ) {
-  const [image, setImage] = useState(props.value)
+  const [image, setImage] = useState(props.value);
 
   const { setValue, register } = useForm<{
-    value: string | null | FileList
+    value: string | null | FileList;
   }>({
     defaultValues: {
       value: props.value,
     },
     mode: 'onChange',
     reValidateMode: 'onChange',
-  })
+  });
 
-  const control = register('value')
+  const control = register('value');
 
   const onClear = useCallback(() => {
-    props.onValueChange(null)
-    setValue('value', null)
-    setImage('')
-  }, [props, setValue])
+    props.onValueChange(null);
+    setValue('value', null);
+    setImage('');
+  }, [props, setValue]);
 
   const onValueChange = useCallback(
     ({ image, file }: { image: string; file: File }) => {
-      props.onValueChange(file)
+      props.onValueChange(file);
 
-      setImage(image)
+      setImage(image);
     },
     [props],
-  )
+  );
 
   const Input = () => (
     <ImageUploadInput
@@ -52,24 +52,23 @@ export function ImageUploader(
       multiple={false}
       onValueChange={onValueChange}
     />
-  )
+  );
 
   useEffect(() => {
-    setImage(props.value)
-  }, [props.value])
+    setImage(props.value);
+  }, [props.value]);
 
   if (!image) {
     return (
       <FallbackImage descriptionSection={props.children}>
         <Input />
       </FallbackImage>
-    )
+    );
   }
 
   return (
     <div className={'flex items-center space-x-4'}>
       <label className={'animate-in fade-in zoom-in-50 relative h-20 w-20'}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           decoding="async"
           className={'h-20 w-20 rounded-full object-cover'}
@@ -86,12 +85,12 @@ export function ImageUploader(
         </Button>
       </div>
     </div>
-  )
+  );
 }
 
 function FallbackImage(
   props: React.PropsWithChildren<{
-    descriptionSection?: React.ReactNode
+    descriptionSection?: React.ReactNode;
   }>,
 ) {
   return (
@@ -108,5 +107,5 @@ function FallbackImage(
 
       {props.descriptionSection}
     </div>
-  )
+  );
 }

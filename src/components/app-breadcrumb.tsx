@@ -12,6 +12,7 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
+
 import { If } from './if';
 
 const unslugify = (slug: string) => slug.replace(/-/g, ' ');
@@ -41,12 +42,7 @@ export function AppBreadcrumbs(props: {
     <Breadcrumb>
       <BreadcrumbList>
         {visiblePaths.map((path, index) => {
-          const label =
-            path in values ? (
-              values[path]
-            ) : (
-              unslugify(path)
-            );
+          const label = path in values ? values[path] : unslugify(path);
 
           return (
             <Fragment key={index}>

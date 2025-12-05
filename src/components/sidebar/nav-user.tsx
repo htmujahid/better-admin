@@ -12,6 +12,7 @@ import {
   UserCircle,
 } from 'lucide-react';
 
+import { HasRole } from '@/components/acccess/has-role';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu,
@@ -29,9 +30,7 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import pathsConfig from '@/config/paths.config';
-import { authClient } from '@/lib/auth-client';
-
-import { HasRole } from '../acccess/has-role';
+import { authClient } from '@/lib/auth/auth-client';
 
 export function NavUser({
   user,
@@ -107,10 +106,12 @@ export function NavUser({
                   </DropdownMenuItem>
                 </Link>
               </HasRole>
-              <DropdownMenuItem disabled>
-                <Palette />
-                Preferences (soon)
-              </DropdownMenuItem>
+              <Link href={pathsConfig.app.preferences}>
+                <DropdownMenuItem>
+                  <Palette />
+                  Preferences
+                </DropdownMenuItem>
+              </Link>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem
