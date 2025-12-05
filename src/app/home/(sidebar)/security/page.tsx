@@ -6,6 +6,7 @@ import { AccountSessions } from '@/components/user/account-sessions';
 import { TwoFactorContainer } from '@/components/user/two-factor-container';
 import { UpdateAccountPasswordForm } from '@/components/user/update-account-password';
 import pathsConfig from '@/config/paths.config';
+import { withAuthenticate } from '@/components/acccess/with-authenticate';
 
 async function AccountPage() {
   const [sessionsError, sessions] = await requireSessions();
@@ -27,3 +28,5 @@ async function AccountPage() {
     </div>
   );
 }
+
+export default withAuthenticate(AccountPage);
