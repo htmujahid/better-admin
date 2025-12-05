@@ -1,13 +1,14 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
+import { withAuthenticate } from '@/components/acccess/with-authenticate';
 import { Page, PageTitleBar } from '@/components/page';
 import { DeleteTasksDialog } from '@/components/tasks/delete-tasks-dialog';
 import { UpdateTaskForm } from '@/components/tasks/update-task-form';
 import { Button } from '@/components/ui/button';
 import { client } from '@/orpc';
 
-export default async function UpdateTaskPage({
+async function UpdateTaskPage({
   params,
 }: {
   params: Promise<{ taskId: string }>;
@@ -34,3 +35,5 @@ export default async function UpdateTaskPage({
     </Page>
   );
 }
+
+export default withAuthenticate(UpdateTaskPage);

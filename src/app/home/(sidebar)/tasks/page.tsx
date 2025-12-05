@@ -4,6 +4,7 @@ import Link from 'next/link';
 
 import { PlusIcon } from 'lucide-react';
 
+import { withAuthenticate } from '@/components/acccess/with-authenticate';
 import { DataTableSkeleton } from '@/components/data-table/data-table-skeleton';
 import { Page, PageTitleBar } from '@/components/page';
 import { TasksTable } from '@/components/tasks/tasks-table';
@@ -18,7 +19,7 @@ interface IndexPageProps {
   searchParams: Promise<SearchParams>;
 }
 
-export default async function IndexPage(props: IndexPageProps) {
+async function IndexPage(props: IndexPageProps) {
   const searchParams = await props.searchParams;
   const search = searchParamsCache.parse(searchParams);
 
@@ -73,3 +74,5 @@ export default async function IndexPage(props: IndexPageProps) {
     </HydrateClient>
   );
 }
+
+export default withAuthenticate(IndexPage);

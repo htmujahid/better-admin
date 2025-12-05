@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 
 import {
   ArrowRight,
@@ -20,12 +21,13 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import pathsConfig from '@/config/paths.config';
 
 export default async function HomePage() {
   const [error, session] = await requireSession();
 
   if (error) {
-    throw new Error(error.message);
+    redirect(pathsConfig.auth.signIn);
   }
 
   const { user } = session;

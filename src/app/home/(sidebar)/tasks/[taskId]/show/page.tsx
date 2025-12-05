@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 
 import { CalendarIcon, ClockIcon, PencilIcon } from 'lucide-react';
 
+import { withAuthenticate } from '@/components/acccess/with-authenticate';
 import { Page, PageTitleBar } from '@/components/page';
 import { DeleteTasksDialog } from '@/components/tasks/delete-tasks-dialog';
 import { Badge } from '@/components/ui/badge';
@@ -13,7 +14,7 @@ import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import { client } from '@/orpc';
 
-export default async function ShowTaskPage({
+async function ShowTaskPage({
   params,
 }: {
   params: Promise<{ taskId: string }>;
@@ -83,3 +84,5 @@ export default async function ShowTaskPage({
     </Page>
   );
 }
+
+export default withAuthenticate(ShowTaskPage);

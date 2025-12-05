@@ -1,19 +1,22 @@
+import { redirect } from 'next/navigation';
+
 import { requireSession } from '@/actions/user/require-session';
 import { requireSessions } from '@/actions/user/require-sessions';
 import { AccountSessions } from '@/components/user/account-sessions';
 import { TwoFactorContainer } from '@/components/user/two-factor-container';
 import { UpdateAccountPasswordForm } from '@/components/user/update-account-password';
+import pathsConfig from '@/config/paths.config';
 
-export default async function AccountPage() {
+async function AccountPage() {
   const [sessionsError, sessions] = await requireSessions();
   const [sessionError, response] = await requireSession();
 
   if (sessionsError) {
-    throw new Error(sessionsError.message);
+    redirect(pathsConfig.auth.signIn);
   }
 
   if (sessionError) {
-    throw new Error(sessionError.message);
+    redirect(pathsConfig.auth.signIn);
   }
 
   return (

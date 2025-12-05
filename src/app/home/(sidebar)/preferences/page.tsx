@@ -3,6 +3,7 @@
 import { Monitor, Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
 
+import { withAuthenticate } from '@/components/acccess/with-authenticate';
 import {
   Card,
   CardContent,
@@ -13,7 +14,7 @@ import {
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
-export default function PreferencesPage() {
+function PreferencesPage() {
   const { theme, setTheme } = useTheme();
 
   return (
@@ -112,3 +113,5 @@ export default function PreferencesPage() {
     </div>
   );
 }
+
+export default withAuthenticate(PreferencesPage);

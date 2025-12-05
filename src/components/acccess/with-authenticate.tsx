@@ -22,6 +22,10 @@ export function withAuthenticate<Params extends object>(
     try {
       const response = await authenticate(args);
 
+      if (!response.user) {
+        throw new Error('User not authenticated');
+      }
+
       return <Component user={response.user} {...params} />;
     } catch (error) {
       console.error(error);
