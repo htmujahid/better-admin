@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { onError } from '@orpc/client';
+import { isDefinedError, onError, onSuccess } from '@orpc/client';
 import { useServerAction } from '@orpc/react/hooks';
 import { Loader } from 'lucide-react';
 import { useForm } from 'react-hook-form';
@@ -12,16 +12,24 @@ import { createTask } from '@/orpc/actions/tasks/create-task';
 import { type CreateTaskInput, createTaskSchema } from '@/validators/tasks';
 
 import { TaskForm } from './task-form';
+import { useRouter } from 'next/navigation';
 
 export function CreateTaskForm() {
+  const router = useRouter();
   const form = useForm<CreateTaskInput>({
     resolver: zodResolver(createTaskSchema),
   });
 
   const { execute, status } = useServerAction(createTask, {
     interceptors: [
+      onSuccess(() => {
+        toast.success('Task created successfully');
+        router.push("/home/tasks");
+      }),
       onError((error) => {
-        toast.error(error.message || 'Failed to create task');
+        if (isDefinedError(error)) {
+          toast.error(error || 'Failed to create task');
+        }
       }),
     ],
   });

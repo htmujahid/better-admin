@@ -1,6 +1,5 @@
 "use server";
 
-import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { onSuccess } from "@orpc/server";
 import { actionContext } from "@/orpc/middlewares";
@@ -11,7 +10,6 @@ export const createTask = tasksRouter.create.actionable({
   interceptors: [
     onSuccess(async () => {
       revalidatePath("/home/tasks");
-      redirect("/home/tasks");
     })
   ]
 })
