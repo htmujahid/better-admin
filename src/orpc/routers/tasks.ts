@@ -48,7 +48,7 @@ function generateRandomTask() {
   };
 }
 
-export const todoRouter = {
+export const tasksRouter = {
   // Get single task
   get: o
     .route({

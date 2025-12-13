@@ -4,6 +4,8 @@ import * as React from 'react';
 
 import { SelectTrigger } from '@radix-ui/react-select';
 import type { Table } from '@tanstack/react-table';
+import { onError, onSuccess } from '@orpc/client';
+import { useServerAction } from '@orpc/react/hooks';
 import { ArrowUp, CheckCircle2, Download, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -21,7 +23,8 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { type Task, tasks } from '@/db/schema';
 import { exportTableToCSV } from '@/lib/data-table/export';
-import { client } from '@/orpc';
+import { deleteManyTasks } from '@/orpc/actions/tasks/delete-many-task';
+import { updateManyTasks } from '@/orpc/actions/tasks/update-many-task';
 
 export const actions = [
   'update-status',
@@ -38,12 +41,46 @@ interface TasksTableActionBarProps {
 
 export function TasksTableActionBar({ table }: TasksTableActionBarProps) {
   const rows = table.getFilteredSelectedRowModel().rows;
-  const [isPending, startTransition] = React.useTransition();
+  const [isExporting, startExportTransition] = React.useTransition();
   const [currentAction, setCurrentAction] = React.useState<Action | null>(null);
 
+  const { execute: executeUpdateMany, status: updateManyStatus } = useServerAction(updateManyTasks, {
+    interceptors: [
+      onSuccess(() => {
+        toast.success('Tasks updated');
+      }),
+      onError((error) => {
+        toast.error(error.message || 'Failed to update tasks');
+      }),
+    ],
+  });
+
+  const { execute: executeDeleteMany, status: deleteManyStatus } = useServerAction(deleteManyTasks, {
+    interceptors: [
+      onSuccess(() => {
+        toast.success('Tasks deleted');
+        table.toggleAllRowsSelected(false);
+      }),
+      onError((error) => {
+        toast.error(error.message || 'Failed to delete tasks');
+      }),
+    ],
+  });
+
   const getIsActionPending = React.useCallback(
-    (action: Action) => isPending && currentAction === action,
-    [isPending, currentAction],
+    (action: Action) => {
+      if (action === 'update-status' || action === 'update-priority') {
+        return updateManyStatus === 'pending' && currentAction === action;
+      }
+      if (action === 'delete') {
+        return deleteManyStatus === 'pending';
+      }
+      if (action === 'export') {
+        return isExporting && currentAction === action;
+      }
+      return false;
+    },
+    [updateManyStatus, deleteManyStatus, isExporting, currentAction],
   );
 
   const onTaskUpdate = React.useCallback(
@@ -57,26 +94,17 @@ export function TasksTableActionBar({ table }: TasksTableActionBarProps) {
       setCurrentAction(
         field === 'status' ? 'update-status' : 'update-priority',
       );
-      startTransition(async () => {
-        try {
-          await client.todo.updateMany({
-            ids: rows.map((row) => row.original.id),
-            [field]: value,
-          });
-          toast.success('Tasks updated');
-        } catch (error) {
-          toast.error(
-            error instanceof Error ? error.message : 'Failed to update tasks',
-          );
-        }
+      executeUpdateMany({
+        ids: rows.map((row) => row.original.id),
+        [field]: value,
       });
     },
-    [rows],
+    [rows, executeUpdateMany],
   );
 
   const onTaskExport = React.useCallback(() => {
     setCurrentAction('export');
-    startTransition(() => {
+    startExportTransition(() => {
       exportTableToCSV(table, {
         excludeColumns: ['select', 'actions'],
         onlySelected: true,
@@ -86,19 +114,10 @@ export function TasksTableActionBar({ table }: TasksTableActionBarProps) {
 
   const onTaskDelete = React.useCallback(() => {
     setCurrentAction('delete');
-    startTransition(async () => {
-      try {
-        await client.todo.deleteMany({
-          ids: rows.map((row) => row.original.id),
-        });
-        table.toggleAllRowsSelected(false);
-      } catch (error) {
-        toast.error(
-          error instanceof Error ? error.message : 'Failed to delete tasks',
-        );
-      }
+    executeDeleteMany({
+      ids: rows.map((row) => row.original.id),
     });
-  }, [rows, table]);
+  }, [rows, executeDeleteMany]);
 
   return (
     <DataTableActionBar table={table} visible={rows.length > 0}>

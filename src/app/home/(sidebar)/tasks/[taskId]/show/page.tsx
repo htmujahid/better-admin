@@ -21,7 +21,7 @@ async function ShowTaskPage({
 }) {
   const { taskId } = await params;
 
-  const data = await client.todo.get({ id: taskId });
+  const data = await client.tasks.get({ id: taskId });
 
   if (!data) {
     notFound();

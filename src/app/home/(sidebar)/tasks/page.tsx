@@ -10,8 +10,7 @@ import { Page, PageTitleBar } from '@/components/page';
 import { TasksTable } from '@/components/tasks/tasks-table';
 import { Button } from '@/components/ui/button';
 import { getValidFilters } from '@/lib/data-table/data-table';
-import { HydrateClient, getQueryClient } from '@/lib/query/hydration';
-import { orpc } from '@/orpc';
+import { client } from '@/orpc';
 import type { SearchParams } from '@/types';
 import { searchParamsCache } from '@/validators/tasks';
 
@@ -25,53 +24,47 @@ async function IndexPage(props: IndexPageProps) {
 
   const validFilters = getValidFilters(search.filters);
 
-  const queryClient = getQueryClient();
-
-  queryClient.prefetchQuery(
-    orpc.todo.list.queryOptions({
-      input: {
-        ...search,
-        filters: validFilters,
-      },
+  const promises = Promise.all([
+    client.tasks.list({
+      ...search,
+      filters: validFilters,
     }),
-  );
-  queryClient.prefetchQuery(orpc.todo.statusCounts.queryOptions({}));
-  queryClient.prefetchQuery(orpc.todo.priorityCounts.queryOptions({}));
-  queryClient.prefetchQuery(orpc.todo.estimatedHoursRange.queryOptions({}));
+    client.tasks.statusCounts(),
+    client.tasks.priorityCounts(),
+    client.tasks.estimatedHoursRange()
+  ])
 
   return (
-    <HydrateClient client={queryClient}>
-      <Page>
-        <PageTitleBar title="Tasks" description="Manage your tasks">
-          <Link href="/home/tasks/create">
-            <Button>
-              <PlusIcon />
-              New Task
-            </Button>
-          </Link>
-        </PageTitleBar>
-        <React.Suspense
-          fallback={
-            <DataTableSkeleton
-              columnCount={7}
-              filterCount={2}
-              cellWidths={[
-                '10rem',
-                '30rem',
-                '10rem',
-                '10rem',
-                '6rem',
-                '6rem',
-                '6rem',
-              ]}
-              shrinkZero
-            />
-          }
-        >
-          <TasksTable search={{ ...search, filters: validFilters }} />
-        </React.Suspense>
-      </Page>
-    </HydrateClient>
+    <Page>
+      <PageTitleBar title="Tasks" description="Manage your tasks">
+        <Link href="/home/tasks/create">
+          <Button>
+            <PlusIcon />
+            New Task
+          </Button>
+        </Link>
+      </PageTitleBar>
+      <React.Suspense
+        fallback={
+          <DataTableSkeleton
+            columnCount={7}
+            filterCount={2}
+            cellWidths={[
+              '10rem',
+              '30rem',
+              '10rem',
+              '10rem',
+              '6rem',
+              '6rem',
+              '6rem',
+            ]}
+            shrinkZero
+          />
+        }
+      >
+        <TasksTable promises={promises} />
+      </React.Suspense>
+    </Page>
   );
 }
 

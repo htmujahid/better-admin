@@ -4,8 +4,8 @@ import { useCallback } from 'react';
 
 import { toast } from 'sonner';
 
-import { deleteAccountImage } from '@/actions/user/delete-account-image';
-import { uploadAccountImage } from '@/actions/user/upload-account-image';
+import { deleteAccountImage } from '@/orpc/actions/user/delete-account-image';
+import { uploadAccountImage } from '@/orpc/actions/user/upload-account-image';
 import { ImageUploader } from '@/components/image-uploader';
 import {
   Card,

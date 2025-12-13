@@ -11,7 +11,7 @@ import {
   Users,
 } from 'lucide-react';
 
-import { requireSession } from '@/actions/user/require-session';
+import { requireSession } from '@/orpc/actions/user/require-session';
 import { HasRole } from '@/components/acccess/has-role';
 import { Button } from '@/components/ui/button';
 import {

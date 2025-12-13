@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 
-import { requireSession } from '@/actions/user/require-session';
-import { requireSessions } from '@/actions/user/require-sessions';
+import { requireSession } from '@/orpc/actions/user/require-session';
+import { requireSessions } from '@/orpc/actions/user/require-sessions';
 import { AccountSessions } from '@/components/user/account-sessions';
 import { TwoFactorContainer } from '@/components/user/two-factor-container';
 import { UpdateAccountPasswordForm } from '@/components/user/update-account-password';

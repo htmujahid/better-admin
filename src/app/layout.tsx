@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { cookies } from 'next/headers';
 
-import { getSession } from '@/actions/user/get-session';
+import { getSession } from '@/orpc/actions/user/get-session';
 import { RootProviders } from '@/components/providers/root-provider';
 import { Toaster } from '@/components/ui/sonner';
 import { createI18nServerInstance } from '@/lib/i18n/i18n-server';

@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 
-import { requireSession } from '@/actions/user/require-session';
+import { requireSession } from '@/orpc/actions/user/require-session';
 import { AccountDangerZone } from '@/components/user/account-danger-zone';
 import { AccountRoles } from '@/components/user/account-roles';
 import { UpdateAccountDetailsForm } from '@/components/user/update-account-details-form';

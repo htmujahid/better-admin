@@ -5,6 +5,8 @@ import * as React from 'react';
 import Link from 'next/link';
 
 import type { ColumnDef } from '@tanstack/react-table';
+import { onError, onSuccess } from '@orpc/client';
+import { useServerAction } from '@orpc/react/hooks';
 import {
   ArrowUpDown,
   CalendarIcon,
@@ -35,7 +37,7 @@ import {
 import { type Task, tasks } from '@/db/schema';
 import { formatDate } from '@/lib/format';
 import { getPriorityIcon, getStatusIcon } from '@/lib/tasks';
-import { client } from '@/orpc';
+import { updateTask } from '@/orpc/actions/tasks/update-task';
 import type { DataTableRowAction } from '@/types/data-table';
 
 interface GetTasksTableColumnsProps {
@@ -223,7 +225,18 @@ export function getTasksTableColumns({
     {
       id: 'actions',
       cell: function Cell({ row }) {
-        const [isUpdatePending, startUpdateTransition] = React.useTransition();
+        const { execute, status } = useServerAction(updateTask, {
+          interceptors: [
+            onSuccess(() => {
+              toast.success('Label updated');
+            }),
+            onError((error) => {
+              toast.error(error.message || 'Failed to update label');
+            }),
+          ],
+        });
+
+        const isUpdatePending = status === 'pending';
 
         return (
           <DropdownMenu>
@@ -246,21 +259,9 @@ export function getTasksTableColumns({
                   <DropdownMenuRadioGroup
                     value={row.original.label}
                     onValueChange={(value) => {
-                      startUpdateTransition(() => {
-                        toast.promise(
-                          client.todo.update({
-                            id: row.original.id,
-                            label: value as Task['label'],
-                          }),
-                          {
-                            loading: 'Updating...',
-                            success: 'Label updated',
-                            error: (err) =>
-                              err instanceof Error
-                                ? err.message
-                                : 'Failed to update label',
-                          },
-                        );
+                      execute({
+                        id: row.original.id,
+                        label: value as Task['label'],
                       });
                     }}
                   >

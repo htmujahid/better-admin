@@ -2,7 +2,7 @@
 
 import { headers } from 'next/headers';
 
-import { getSession } from '@/actions/user/get-session';
+import { getSession } from '@/orpc/actions/user/get-session';
 
 import { auth } from '.';
 import { Permissions, Role } from './roles';

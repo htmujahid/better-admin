@@ -1,15 +1,15 @@
 'use client';
 
-import * as React from 'react';
-
 import { zodResolver } from '@hookform/resolvers/zod';
+import { onError, onSuccess } from '@orpc/client';
+import { useServerAction } from '@orpc/react/hooks';
 import { Loader } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import type { Task } from '@/db/schema';
-import { client } from '@/orpc';
+import { updateTask } from '@/orpc/actions/tasks/update-task';
 import { type UpdateTaskInput, updateTaskSchema } from '@/validators/tasks';
 
 import { TaskForm } from './task-form';
@@ -19,8 +19,6 @@ interface UpdateTaskFormProps {
 }
 
 export function UpdateTaskForm({ task }: UpdateTaskFormProps) {
-  const [isPending, startTransition] = React.useTransition();
-
   const form = useForm<Omit<UpdateTaskInput, 'id'>>({
     resolver: zodResolver(updateTaskSchema.omit({ id: true })),
     defaultValues: {
@@ -32,23 +30,22 @@ export function UpdateTaskForm({ task }: UpdateTaskFormProps) {
     },
   });
 
-  function onSubmit(input: Omit<UpdateTaskInput, 'id'>) {
-    startTransition(async () => {
-      if (!task) return;
-
-      try {
-        await client.todo.update({
-          id: task.id,
-          ...input,
-        });
-        form.reset(input);
+  const { execute, status } = useServerAction(updateTask, {
+    interceptors: [
+      onSuccess(() => {
         toast.success('Task updated');
-      } catch (error) {
-        toast.error(
-          error instanceof Error ? error.message : 'Failed to update task',
-        );
-      }
-    });
+      }),
+      onError((error) => {
+        toast.error(error.message || 'Failed to update task');
+      }),
+    ],
+  });
+
+  const isPending = status === 'pending';
+
+  function onSubmit(input: Omit<UpdateTaskInput, 'id'>) {
+    if (!task) return;
+    execute({ id: task.id, ...input });
   }
 
   return (

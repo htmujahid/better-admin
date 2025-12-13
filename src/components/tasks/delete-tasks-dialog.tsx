@@ -5,6 +5,8 @@ import * as React from 'react';
 import { useRouter } from 'next/navigation';
 
 import type { Row } from '@tanstack/react-table';
+import { onError, onSuccess } from '@orpc/client';
+import { useServerAction } from '@orpc/react/hooks';
 import { Loader, Trash } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -31,42 +33,47 @@ import {
 } from '@/components/ui/drawer';
 import type { Task } from '@/db/schema';
 import { useMediaQuery } from '@/hooks/use-media-query';
-import { client } from '@/orpc';
+import { deleteManyTasks } from '@/orpc/actions/tasks/delete-many-task';
 
 interface DeleteTasksDialogProps extends React.ComponentPropsWithoutRef<
   typeof Dialog
 > {
   tasks: Row<Task>['original'][];
   showTrigger?: boolean;
-  onSuccess?: () => void;
+  onDeleteSuccess?: () => void;
+  redirectOnSuccess?: boolean;
 }
 
 export function DeleteTasksDialog({
   tasks,
   showTrigger = true,
-  onSuccess,
+  onDeleteSuccess,
+  redirectOnSuccess = true,
   ...props
 }: DeleteTasksDialogProps) {
   const router = useRouter();
-  const [isDeletePending, startDeleteTransition] = React.useTransition();
   const isDesktop = useMediaQuery('(min-width: 640px)');
 
-  function onDelete() {
-    startDeleteTransition(async () => {
-      try {
-        await client.todo.deleteMany({
-          ids: tasks.map((task) => task.id),
-        });
+  const { execute, status } = useServerAction(deleteManyTasks, {
+    interceptors: [
+      onSuccess(() => {
         props.onOpenChange?.(false);
         toast.success('Tasks deleted');
-        onSuccess?.();
-        router.push('/home/tasks');
-      } catch (error) {
-        toast.error(
-          error instanceof Error ? error.message : 'Failed to delete tasks',
-        );
-      }
-    });
+        onDeleteSuccess?.();
+        if (redirectOnSuccess) {
+          router.push('/home/tasks');
+        }
+      }),
+      onError((error) => {
+        toast.error(error.message || 'Failed to delete tasks');
+      }),
+    ],
+  });
+
+  const isDeletePending = status === 'pending';
+
+  function onDelete() {
+    execute({ ids: tasks.map((task) => task.id) });
   }
 
   if (isDesktop) {
